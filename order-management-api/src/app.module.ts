@@ -1,6 +1,6 @@
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { OrdersModule } from "./modules/orders/orders.module";
-import { Module } from "@nestjs/common/decorators/modules/module.decorator";
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { OrdersModule } from './modules/orders/orders.module'
+import { Module } from '@nestjs/common/decorators/modules/module.decorator'
 
 @Module({
   imports: [

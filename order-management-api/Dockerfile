@@ -1,4 +1,6 @@
-FROM node:18
+# order-management-api/Dockerfile
+
+FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
@@ -9,4 +11,5 @@ COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "start:prod"]
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
