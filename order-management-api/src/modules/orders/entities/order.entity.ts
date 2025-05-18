@@ -1,36 +1,54 @@
-import { Entity, OneToMany } from 'typeorm';
-import { OrderItem } from './order-item.entity';
-import { CreateOrderItemDto } from '../dtos/create-order.dto';
-import { Product } from '@modules/products/entities/product.entity';
+import {
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { OrderItem } from './order-item.entity'
+import { CreateOrderItemDto } from '../dtos/create-order.dto'
+import { Product } from '@modules/products/entities/product.entity'
 
 @Entity()
 export class Order {
+  @PrimaryGeneratedColumn()
+  id: number
+
+  @Column()
+  customerId: number
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  total: number
+
+  @Column()
+  status: string
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
+
   @OneToMany(() => OrderItem, (item) => item.order, {
     cascade: true,
-    eager: true 
+    eager: true,
   })
-  items: OrderItem[];
-    total: any;
-    customerId: any;
-    createdAt: any;
-    id: any;
-    status: any;
-    updatedAt: any;
+  items: OrderItem[]
 
-  // Método para adicionar item ao pedido
   addItem(itemDto: CreateOrderItemDto): OrderItem {
-    const item = new OrderItem();
-    item.product = { id: itemDto.productId } as Product;
-    item.unitPrice = itemDto.unitPrice;
-    item.quantity = itemDto.quantity;
-    item.notes = itemDto.notes || null;
-    item.calculateTotal();
+    const item = new OrderItem()
+    item.product = { id: itemDto.productId } as Product
+    item.unitPrice = itemDto.unitPrice
+    item.quantity = itemDto.quantity
+    item.notes = itemDto.notes || null
+    item.calculateTotal()
 
     if (!this.items) {
-      this.items = [];
+      this.items = []
     }
-    this.items.push(item);
+    this.items.push(item)
 
-    return item;
+    return item
   }
 }

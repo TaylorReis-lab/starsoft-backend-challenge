@@ -5,15 +5,10 @@ import {
   Param,
   Body,
   HttpCode,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-} from '@nestjs/swagger';
-import { OrderItemService } from '../services/order-item.service';
-import { UpdateOrderItemDto } from '../dtos/update-order.dto';
+} from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger'
+import { OrderItemService } from '../services/order-item.service'
+import { UpdateOrderItemDto } from '../dtos/update-order.dto'
 
 @ApiTags('Order Items')
 @Controller('order-items')
@@ -29,7 +24,7 @@ export class OrderItemController {
     @Param('id') itemId: string,
     @Body() updateDto: UpdateOrderItemDto,
   ) {
-    return this.orderItemService.updateItem(itemId, updateDto);
+    return this.orderItemService.updateItem(itemId, updateDto)
   }
 
   @Delete(':id')
@@ -39,6 +34,6 @@ export class OrderItemController {
   @ApiResponse({ status: 204, description: 'Item removed' })
   @ApiResponse({ status: 404, description: 'Item not found' })
   async removeItem(@Param('id') itemId: string) {
-    await this.orderItemService.removeItem(itemId);
+    await this.orderItemService.removeItem(itemId)
   }
 }

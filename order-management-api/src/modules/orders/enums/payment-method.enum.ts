@@ -4,5 +4,5 @@ export enum PaymentMethod {
   PIX = 'pix',
   BANK_TRANSFER = 'bank_transfer',
   CASH = 'cash',
-  DIGITAL_WALLET = 'digital_wallet'
+  DIGITAL_WALLET = 'digital_wallet',
 }

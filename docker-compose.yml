@@ -31,12 +31,12 @@ services:
     image: postgres:14-alpine
     container_name: postgres
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: order-api
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order-api"]
       interval: 5s
       timeout: 5s
       retries: 5

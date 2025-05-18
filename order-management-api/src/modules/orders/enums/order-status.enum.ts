@@ -6,15 +6,15 @@ export enum OrderStatus {
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded',
   FAILED = 'failed',
-  CREATED = "CREATED"
+  CREATED = 'CREATED',
 }
 
 // Tipo para validação
-export type OrderStatusType = 
+export type OrderStatusType =
   | 'pending'
   | 'processing'
   | 'shipped'
   | 'delivered'
   | 'cancelled'
   | 'refunded'
-  | 'failed';
+  | 'failed'

@@ -9,7 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
-} from '@nestjs/common';
+} from '@nestjs/common'
 import {
   ApiTags,
   ApiOperation,
@@ -17,11 +17,11 @@ import {
   ApiParam,
   ApiBody,
   ApiQuery,
-} from '@nestjs/swagger';
-import { OrderService } from '../services/orders.service';
-import { CreateOrderItemDto } from '../dtos/create-order.dto';
-import { UpdateOrderItemDto } from '../dtos/update-order.dto';
-import { OrderStatus } from '../enums/order-status.enum';
+} from '@nestjs/swagger'
+import { OrderService } from '../services/orders.service'
+import { CreateOrderItemDto } from '../dtos/create-order.dto'
+import { UpdateOrderItemDto } from '../dtos/update-order.dto'
+import { OrderStatus } from '../enums/order-status.enum'
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -31,31 +31,31 @@ export class OrdersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new order' })
-  @ApiResponse({ 
+  @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Order was successfully created'
+    description: 'Order was successfully created',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid input data'
+    description: 'Invalid input data',
   })
   async createOrder(@Body() createOrderDto: CreateOrderItemDto) {
-    return this.ordersService.createOrder(createOrderDto);
+    return this.ordersService.createOrder(createOrderDto)
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get order details' })
   @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiResponse({ 
+  @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Order found and returned'
+    description: 'Order found and returned',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Order not found'
+    description: 'Order not found',
   })
   async getOrder(@Param('id') orderId: string) {
-    return this.ordersService.getOrderById(orderId);
+    return this.ordersService.getOrderById(orderId)
   }
 
   @Patch(':id/status')
@@ -64,17 +64,17 @@ export class OrdersController {
   @ApiBody({ description: 'New order status' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Order status updated'
+    description: 'Order status updated',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid status transition'
+    description: 'Invalid status transition',
   })
   async updateOrderStatus(
     @Param('id') orderId: string,
-    @Body() updateOrderDto: UpdateOrderItemDto
+    @Body() updateOrderDto: UpdateOrderItemDto,
   ) {
-    return this.ordersService.updateOrderStatus(orderId, updateOrderDto.status);
+    return this.ordersService.updateOrderStatus(orderId, updateOrderDto.status)
   }
 
   @Delete(':id')
@@ -83,37 +83,37 @@ export class OrdersController {
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: 'Order was cancelled'
+    description: 'Order was cancelled',
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: 'Order cannot be cancelled in current status'
+    description: 'Order cannot be cancelled in current status',
   })
   async cancelOrder(@Param('id') orderId: string) {
-    await this.ordersService.cancelOrder(orderId);
+    await this.ordersService.cancelOrder(orderId)
   }
 
   @Get()
   @ApiOperation({ summary: 'List all orders with filters' })
-  @ApiQuery({ 
-    name: 'status', 
+  @ApiQuery({
+    name: 'status',
     required: false,
     enum: OrderStatus,
-    description: 'Filter by order status'
+    description: 'Filter by order status',
   })
   @ApiQuery({
     name: 'customerId',
     required: false,
-    description: 'Filter by customer ID'
+    description: 'Filter by customer ID',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'List of filtered orders'
+    description: 'List of filtered orders',
   })
   async listOrders(
     @Query('status') status?: OrderStatus,
-    @Query('customerId') customerId?: string
+    @Query('customerId') customerId?: string,
   ) {
-    return this.ordersService.listOrders({ status, customerId });
+    return this.ordersService.listOrders({ status, customerId })
   }
 }
