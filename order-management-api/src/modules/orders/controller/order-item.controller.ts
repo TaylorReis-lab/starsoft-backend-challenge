@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger'
 import { OrderItemService } from '../services/order-item.service'
-import { UpdateOrderItemDto } from '../dtos/update-order.dto'
+import { UpdateOrderDto } from '../dtos/update-order.dto'
 
 @ApiTags('Order Items')
 @Controller('order-items')
@@ -22,7 +22,7 @@ export class OrderItemController {
   @ApiResponse({ status: 404, description: 'Item not found' })
   async updateItem(
     @Param('id') itemId: string,
-    @Body() updateDto: UpdateOrderItemDto,
+    @Body() updateDto: UpdateOrderDto,
   ) {
     return this.orderItemService.updateItem(itemId, updateDto)
   }

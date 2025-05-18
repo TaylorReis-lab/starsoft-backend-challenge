@@ -22,9 +22,11 @@
       "@config/*": ["src/config/*"],
       "@docs/*": ["src/config/docs/*"],
       "@elasticsearch/*": [".docker/elasticsearch/*"],
-      "@kafka/*": ["src/modules/shared/kafka/*"],
+      "@kafka/*": ["src/modules/infrastructure/kafka/*"],
       "@modules/*": ["src/modules/*"],
       "@test/*": ["src/test/*"]
     }
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -1,11 +1,18 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ElasticsearchService as NestElasticsearchService } from '@nestjs/elasticsearch'
-import { Order } from '../../orders/entities/order.entity'
-import { OrderStatus } from '../../orders/enums/order-status.enum'
+import { Order } from '../../../orders/entities/order.entity'
+import { OrderStatus } from '../../../orders/enums/order-status.enum'
 import { IndicesCreateRequest } from '@elastic/elasticsearch/lib/api/types'
+import { FilterOrderDto } from '@modules/orders/dtos/filter-order.dto'
 
 @Injectable()
 export class ElasticsearchService implements OnModuleInit {
+  updateOrderIndex(_updatedOrder: Order) {
+    throw new Error('Method not implemented.')
+  }
+  search(_filterDto: FilterOrderDto) {
+    throw new Error('Method not implemented.')
+  }
   private readonly logger = new Logger(ElasticsearchService.name)
   private readonly indexName = 'orders'
 
@@ -103,13 +110,6 @@ export class ElasticsearchService implements OnModuleInit {
       customerId: order.customerId,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      items: order.items?.map((item) => ({
-        productId:
-          typeof item.product === 'object' ? item.product.id : item.product,
-        name: typeof item.product === 'object' ? item.product.name : '',
-        quantity: item.quantity,
-        price: item.price,
-      })),
     }
   }
 

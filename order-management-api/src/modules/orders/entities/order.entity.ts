@@ -1,54 +1,106 @@
-import {
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm'
-import { OrderItem } from './order-item.entity'
-import { CreateOrderItemDto } from '../dtos/create-order.dto'
-import { Product } from '@modules/products/entities/product.entity'
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { OrderItem } from './order-item.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity()
+export const OrderStatus = {
+  PENDING: 'pending',
+  PROCESSING: 'processing',
+  SHIPPED: 'shipped',
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+@Entity('orders')
 export class Order {
+  @ApiProperty({
+    description: 'ID único do pedido',
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  })
   @PrimaryGeneratedColumn()
-  id: number
+  id: string;
 
-  @Column()
-  customerId: number
+  @ApiProperty({
+    description: 'Nome do cliente',
+    example: 'João Silva'
+  })
+  @Column({ nullable: false })
+  customerName: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  total: number
+  @ApiProperty({
+    description: 'Email do cliente',
+    example: 'joao.silva@exemplo.com'
+  })
+  @Column({ nullable: false })
+  customerEmail: string;
 
-  @Column()
-  status: string
+  @ApiProperty({
+    description: 'Telefone do cliente',
+    example: '+5511999999999',
+    required: false
+  })
+  @Column({ nullable: true })
+  customerPhone: string;
 
-  @CreateDateColumn()
-  createdAt: Date
+  @ApiProperty({
+    description: 'Status do pedido',
+    enum: OrderStatus,
+    example: OrderStatus.PENDING
+  })
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
+  })
+  status: OrderStatus;
 
-  @UpdateDateColumn()
-  updatedAt: Date
+  @ApiProperty({
+    description: 'Valor total do pedido',
+    example: 1299.99
+  })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  totalAmount: number;
 
-  @OneToMany(() => OrderItem, (item) => item.order, {
+  @ApiProperty({
+    description: 'Itens do pedido',
+    type: [OrderItem]
+  })
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
     cascade: true,
     eager: true,
   })
-  items: OrderItem[]
+  items: OrderItem[];
 
-  addItem(itemDto: CreateOrderItemDto): OrderItem {
-    const item = new OrderItem()
-    item.product = { id: itemDto.productId } as Product
-    item.unitPrice = itemDto.unitPrice
-    item.quantity = itemDto.quantity
-    item.notes = itemDto.notes || null
-    item.calculateTotal()
+  @ApiProperty({
+    description: 'Endereço de entrega',
+    example: 'Rua Exemplo, 123 - São Paulo/SP',
+    required: false
+  })
+  @Column({ nullable: true })
+  shippingAddress: string;
 
-    if (!this.items) {
-      this.items = []
-    }
-    this.items.push(item)
+  @ApiProperty({
+    description: 'Observações do pedido',
+    example: 'Entregar na portaria',
+    required: false
+  })
+  @Column({ nullable: true })
+  notes: string;
 
-    return item
-  }
+  @ApiProperty({
+    description: 'Data de criação do pedido',
+    example: '2025-05-11T12:00:00.000Z'
+  })
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Data da última atualização do pedido',
+    example: '2025-05-11T12:00:00.000Z'
+  })
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+  total: any;
+  customerId: any;
 }

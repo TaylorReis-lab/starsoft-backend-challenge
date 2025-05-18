@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { OrderItem } from '../entities/order-item.entity'
-import { UpdateOrderItemDto } from '../dtos/update-order.dto'
+import { UpdateOrderDto } from '../dtos/update-order.dto'
 
 @Injectable()
 export class OrderItemService {
@@ -16,7 +16,7 @@ export class OrderItemService {
 
   async updateItem(
     itemId: string,
-    updateDto: UpdateOrderItemDto,
+    updateDto: UpdateOrderDto,
   ): Promise<OrderItem> {
     const item = await this.orderItemRepository.findOneBy({ id: itemId })
 

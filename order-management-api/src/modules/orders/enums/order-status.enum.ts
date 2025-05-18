@@ -7,14 +7,4 @@ export enum OrderStatus {
   REFUNDED = 'refunded',
   FAILED = 'failed',
   CREATED = 'CREATED',
-}
-
-// Tipo para validação
-export type OrderStatusType =
-  | 'pending'
-  | 'processing'
-  | 'shipped'
-  | 'delivered'
-  | 'cancelled'
-  | 'refunded'
-  | 'failed'
+} 

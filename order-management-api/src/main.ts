@@ -1,23 +1,38 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  console.log('Iniciando aplicação Nest.js...');
 
-  app.useGlobalInterceptors(new LoggingInterceptor())
+  try {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      cors: true,
+    });
 
-  const config = new DocumentBuilder()
-    .setTitle('Order Management API')
-    .setDescription('API de gerenciamento de pedidos para e-commerce')
-    .setVersion('1.0')
-    .addTag('Pedidos')
-    .build()
+    app.useGlobalPipes(new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }));
 
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api-docs', app, document)
+    const config = new DocumentBuilder()
+      .setTitle('API de Gerenciamento de Pedidos')
+      .setDescription('API RESTful para gerenciamento de pedidos com integração Kafka e Elasticsearch')
+      .setVersion('1.0')
+      .build();
+    
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(3000)
+    await app.listen(3000);
+    console.log(`Aplicação rodando em: ${await app.getUrl()}`);
+  } catch (error) {
+    console.error('Erro ao iniciar a aplicação Nest.js:', error);
+    process.exit(1);
+  }
 }
-bootstrap()
+
+bootstrap();

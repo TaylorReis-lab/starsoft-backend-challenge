@@ -6,11 +6,9 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch'
 import { getTypeOrmConfig } from './config/typeorm.config'
 import { getKafkaConfig } from './config/kafka.config'
 import { getElasticsearchConfig } from './config/elasticsearch.config'
-import { HealthModule } from '@modules/health/health.module'
 
 @Module({
   imports: [
-    HealthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

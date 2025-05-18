@@ -1,20 +1,23 @@
-# Usa imagem Node como base
-FROM node:24-alpine
+FROM node:18-alpine
 
-# Cria diretório de trabalho
 WORKDIR /usr/src/app
 
-# Copia os arquivos de dependências
-COPY package*.json ./
+# Instala dependências de compilação
+RUN apk add --no-cache python3 make g++
 
-# Instala as dependências
+# Copia arquivos de configuração
+COPY package*.json tsconfig*.json ./
+
+# Instala dependências
 RUN npm install
 
-# Copia os arquivos da aplicação
+# Copia todo o código fonte
 COPY . .
 
-# Expõe a porta da aplicação
-EXPOSE 3000
+# Compila o TypeScript para JavaScript
+RUN npm run build
 
-# Comando padrão
-CMD ["npm", "run", "start:dev"]
+# Remove arquivos TypeScript (opcional)
+RUN find src -name "*.ts" -type f -delete
+
+CMD ["node", "dist/main"]

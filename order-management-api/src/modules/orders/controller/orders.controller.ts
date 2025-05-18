@@ -1,119 +1,96 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  Patch,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  Query,
-} from '@nestjs/common'
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-  ApiQuery,
-} from '@nestjs/swagger'
-import { OrderService } from '../services/orders.service'
-import { CreateOrderItemDto } from '../dtos/create-order.dto'
-import { UpdateOrderItemDto } from '../dtos/update-order.dto'
-import { OrderStatus } from '../enums/order-status.enum'
+import { Controller, Get, Post, Body, Param, Patch, Delete, Query, HttpStatus } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { OrderService } from '../services/orders.service';
+import { Order } from '../entities/order.entity';
+import { CreateOrderDto } from '../dtos/create-order.dto';
+import { UpdateOrderDto } from '../dtos/update-order.dto';
+import { FilterOrderDto } from '../dtos/filter-order.dto';
 
-@ApiTags('Orders')
+@ApiTags('pedidos')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrderService) {}
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Criar um novo pedido' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Order was successfully created',
+    description: 'Pedido criado com sucesso',
+    type: Order,
   })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid input data',
-  })
-  async createOrder(@Body() createOrderDto: CreateOrderItemDto) {
-    return this.ordersService.createOrder(createOrderDto)
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get order details' })
-  @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Order found and returned',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Order not found',
-  })
-  async getOrder(@Param('id') orderId: string) {
-    return this.ordersService.getOrderById(orderId)
-  }
-
-  @Patch(':id/status')
-  @ApiOperation({ summary: 'Update order status' })
-  @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiBody({ description: 'New order status' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Order status updated',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid status transition',
-  })
-  async updateOrderStatus(
-    @Param('id') orderId: string,
-    @Body() updateOrderDto: UpdateOrderItemDto,
-  ) {
-    return this.ordersService.updateOrderStatus(orderId, updateOrderDto.status)
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Cancel an order' })
-  @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
-    description: 'Order was cancelled',
-  })
-  @ApiResponse({
-    status: HttpStatus.CONFLICT,
-    description: 'Order cannot be cancelled in current status',
-  })
-  async cancelOrder(@Param('id') orderId: string) {
-    await this.ordersService.cancelOrder(orderId)
+  async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
+    return this.ordersService.create(createOrderDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all orders with filters' })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    enum: OrderStatus,
-    description: 'Filter by order status',
-  })
-  @ApiQuery({
-    name: 'customerId',
-    required: false,
-    description: 'Filter by customer ID',
-  })
+  @ApiOperation({ summary: 'Listar todos os pedidos' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'List of filtered orders',
+    description: 'Lista de pedidos retornada com sucesso',
+    type: [Order],
   })
-  async listOrders(
-    @Query('status') status?: OrderStatus,
-    @Query('customerId') customerId?: string,
-  ) {
-    return this.ordersService.listOrders({ status, customerId })
+  async findAll(): Promise<Order[]> {
+    return this.ordersService.findAll();
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Buscar pedidos com filtros' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Pedidos encontrados com base nos filtros',
+    type: [Order],
+  })
+  async search(@Query() filterDto: FilterOrderDto): Promise<Order[]> {
+    return this.ordersService.search(filterDto);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Buscar um pedido pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID do pedido' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Pedido encontrado',
+    type: Order,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Pedido não encontrado',
+  })
+  async findById(@Param('id') id: string): Promise<Order> {
+    return this.ordersService.findById(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar um pedido pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID do pedido' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Pedido atualizado com sucesso',
+    type: Order,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Pedido não encontrado',
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
+    return this.ordersService.update(id, updateOrderDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remover um pedido pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID do pedido' })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Pedido removido com sucesso',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Pedido não encontrado',
+  })
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.ordersService.remove(id);
   }
 }

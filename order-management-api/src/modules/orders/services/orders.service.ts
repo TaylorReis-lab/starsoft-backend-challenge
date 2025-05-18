@@ -5,10 +5,30 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { CreateOrderItemDto } from '../dtos/create-order.dto'
+import { CreateOrderDto } from '../dtos/create-order.dto'
+import { FilterOrderDto } from '../dtos/filter-order.dto'
+import { UpdateOrderDto } from '../dtos/update-order.dto'
 
 @Injectable()
 export class OrderService {
+  remove(id: string): void | PromiseLike<void> {
+    throw new Error('Method not implemented.')
+  }
+  update(id: string, updateOrderDto: UpdateOrderDto): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+    throw new Error('Method not implemented.')
+  }
+  findById(id: string): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+    throw new Error('Method not implemented.')
+  }
+  search(filterDto: FilterOrderDto): import("../entities/order.entity").Order[] | PromiseLike<import("../entities/order.entity").Order[]> {
+    throw new Error('Method not implemented.')
+  }
+  findAll(): import("../entities/order.entity").Order[] | PromiseLike<import("../entities/order.entity").Order[]> {
+    throw new Error('Method not implemented.')
+  }
+  create(createOrderDto: CreateOrderDto): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+    throw new Error('Method not implemented.')
+  }
   getOrderById(orderId: string) {
     throw new Error('Method not implemented.')
   }
@@ -26,29 +46,6 @@ export class OrderService {
     private readonly kafkaClient: any,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderItemDto) {
-    // Criar pedido
-    const order = this.orderRepository.create({
-      items: [createOrderDto],
-      status: OrderStatus.CREATED,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-
-    const savedOrder = await this.orderRepository.save(order)
-
-    // Emitir evento Kafka para pedido criado
-    await this.kafkaClient
-      .emit(KafkaTopics.ORDER_CREATED, {
-        orderId: savedOrder.id,
-        status: savedOrder.status,
-        createdAt: savedOrder.createdAt,
-        items: savedOrder.items,
-      })
-      .toPromise()
-
-    return savedOrder
-  }
 
   async updateOrderStatus(orderId: string, status: OrderStatus) {
     const order = await this.orderRepository.findOne(orderId)
