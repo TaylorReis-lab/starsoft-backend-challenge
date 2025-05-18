@@ -18,9 +18,13 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"],
       "@config/*": ["src/config/*"],
-      "@common/*": ["src/common/*"]
+      "@docs/*": ["src/config/docs/*"],
+      "@elasticsearch/*": [".docker/elasticsearch/*"],
+      "@kafka/*": ["src/modules/shared/kafka/*"],
+      "@modules/*": ["src/modules/*"],
+      "@test/*": ["src/test/*"]
     }
   }
 }
