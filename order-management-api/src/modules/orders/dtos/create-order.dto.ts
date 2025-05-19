@@ -1,104 +1,104 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { 
-  IsString, 
-  IsEmail, 
-  IsOptional, 
-  IsArray, 
-  ValidateNested, 
-  IsNumber, 
-  Min, 
-  IsPositive
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+  Min,
+  IsPositive,
+} from 'class-validator'
 
 export class CreateOrderItemDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID do produto',
-    example: '8f7b5db5-8d69-4a6d-81e5-51f33d0e30b0' 
+    example: '8f7b5db5-8d69-4a6d-81e5-51f33d0e30b0',
   })
   @IsString()
-  productId: string;
+  productId: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Nome do produto',
-    example: 'iPhone 13 Pro' 
+    example: 'iPhone 13 Pro',
   })
   @IsString()
-  productName: string;
+  productName: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Preço unitário do produto',
-    example: 999.99 
+    example: 999.99,
   })
   @IsNumber()
   @IsPositive()
-  unitPrice: number;
+  unitPrice: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quantidade do produto',
-    example: 1 
+    example: 1,
   })
   @IsNumber()
   @Min(1)
-  quantity: number;
+  quantity: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Subtotal do item (preço unitário * quantidade)',
-    example: 999.99 
+    example: 999.99,
   })
   @IsNumber()
   @IsPositive()
-  subtotal: number;
+  subtotal: number
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Nome do cliente',
-    example: 'João Silva' 
+    example: 'João Silva',
   })
   @IsString()
-  customerName: string;
+  customerName: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Email do cliente',
-    example: 'joao.silva@exemplo.com' 
+    example: 'joao.silva@exemplo.com',
   })
   @IsEmail()
-  customerEmail: string;
+  customerEmail: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Telefone do cliente',
     example: '+5511999999999',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
-  customerPhone?: string;
+  customerPhone?: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Itens do pedido',
-    type: [CreateOrderItemDto] 
+    type: [CreateOrderItemDto],
   })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
-  items: CreateOrderItemDto[];
+  items: CreateOrderItemDto[]
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Endereço de entrega',
     example: 'Rua Exemplo, 123 - São Paulo/SP',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
-  shippingAddress?: string;
+  shippingAddress?: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Observações do pedido',
     example: 'Entregar na portaria',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
-  notes?: string;
+  notes?: string
 }

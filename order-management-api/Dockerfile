@@ -1,23 +1,24 @@
-FROM node:18-alpine
+FROM node:18-alpine AS development
 
 WORKDIR /usr/src/app
 
-# Instala dependências de compilação
-RUN apk add --no-cache python3 make g++
+# Instala dependências de compilação e SSL
+RUN apk add --no-cache curl netcat-openbsd
 
-# Copia arquivos de configuração
+# 1. Copia arquivos de configuração primeiro (para melhor cache)
 COPY package*.json tsconfig*.json ./
 
-# Instala dependências
+# 2. Instala dependências
 RUN npm install
 
-# Copia todo o código fonte
+# 3. Copia todo o código fonte
 COPY . .
 
-# Compila o TypeScript para JavaScript
+RUN chmod +x entrypoint.sh
+
+# 4. Compila TypeScript para JavaScript
 RUN npm run build
 
-# Remove arquivos TypeScript (opcional)
-RUN find src -name "*.ts" -type f -delete
+EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD [ "./entrypoint.sh" ]

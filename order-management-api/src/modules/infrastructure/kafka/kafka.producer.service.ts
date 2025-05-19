@@ -1,163 +1,221 @@
-import { Injectable, Logger, OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Kafka, Producer, ProducerRecord } from 'kafkajs';
+import { Test, TestingModule } from '@nestjs/testing'
+import { ConfigService } from '@nestjs/config'
+import { KafkaProducerService } from './kafka-producer.service'
+import { Logger } from '@nestjs/common'
+import { Producer } from 'kafkajs'
 
-@Injectable()
-export class KafkaProducerService implements OnModuleInit, OnApplicationShutdown {
-  private readonly logger = new Logger(KafkaProducerService.name);
-  private producer: Producer;
-  private readonly kafka: Kafka;
-  private isConnected = false;
-  private isConnecting = false;
-  private connectionAttempts = 0;
-  private readonly maxConnectionAttempts: number;
-  private readonly connectionTimeout: number;
-  private readonly retryFactor: number;
-
-  constructor(private readonly configService: ConfigService) {
-    const brokers = this.configService.get<string>('KAFKA_BROKERS', 'kafka:9092').split(',');
-    this.maxConnectionAttempts = this.configService.get<number>('KAFKA_RETRY_MAX', 5);
-    this.retryFactor = this.configService.get<number>('KAFKA_RETRY_FACTOR', 1.5);
-    this.connectionTimeout = this.configService.get<number>('KAFKA_CONNECTION_TIMEOUT', 30000);
-
-    this.logger.log(`Configurando Kafka com brokers: ${brokers.join(', ')}`);
-    
-    this.kafka = new Kafka({
-      clientId: 'order-management-api',
-      brokers,
-      retry: {
-        initialRetryTime: 300,
-        retries: 5,
-        factor: 1.5,
-      },
-      connectionTimeout: 3000, 
-    });
-    
-    this.producer = this.kafka.producer({
-      allowAutoTopicCreation: true,
-    });
-  }
-
-  async onModuleInit() {
-    this.connect().catch(err => {
-      this.logger.warn(`Inicialização não bloqueada apesar do erro de conexão com Kafka: ${err.message}`);
-    });
-  }
-
-  async onApplicationShutdown() {
-    if (this.isConnected) {
-      try {
-        await this.producer.disconnect();
-        this.logger.log('Produtor Kafka desconectado com sucesso.');
-      } catch (error) {
-        this.logger.error(`Erro ao desconectar o produtor Kafka: ${error.message}`);
-      }
-    }
-  }
-
-  private async connect(): Promise<void> {
-    if (this.isConnected || this.isConnecting) {
-      return;
-    }
-
-    this.isConnecting = true;
-
-    try {
-      this.connectionAttempts++;
-      this.logger.log(`Tentando conectar ao Kafka (tentativa ${this.connectionAttempts}/${this.maxConnectionAttempts})...`);
-      
-      const connectionPromise = this.producer.connect();
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout ao conectar ao Kafka')), this.connectionTimeout);
-      });
-
-      await Promise.race([connectionPromise, timeoutPromise]);
-      
-      this.isConnected = true;
-      this.isConnecting = false;
-      this.logger.log('Conectado ao Kafka com sucesso!');
-    } catch (error) {
-      this.isConnecting = false;
-      
-      this.logger.error(`Falha ao conectar ao Kafka: ${error.message}`);
-      
-      if (this.connectionAttempts < this.maxConnectionAttempts) {
-        const waitTime = Math.min(
-          300 * Math.pow(this.retryFactor, this.connectionAttempts - 1),
-          30000
-        );
-        
-        this.logger.log(`Tentando novamente em ${Math.round(waitTime)}ms...`);
-        
-        setTimeout(() => this.connect(), waitTime);
-      } else {
-        this.logger.warn(
-          `Número máximo de tentativas atingido (${this.maxConnectionAttempts}). Desabilitando produtor Kafka.`
-        );
-        this.logger.warn(
-          'A aplicação continuará funcionando, mas os eventos não serão publicados no Kafka.'
-        );
-      }
-    }
-  }
-
-  async publish(topic: string, message: any): Promise<void> {
-    if (typeof message.value === 'string') {
-      return this.produceInternal(topic, message);
-    } else {
-      return this.produceInternal(topic, {
-        key: message.key || message.orderId,
-        value: JSON.stringify(message)
-      });
-    }
-  }
-
-  async produce(topic: string, message: any): Promise<void> {
-    return this.publish(topic, message);
-  }
-
-  private async produceInternal(topic: string, message: { key?: string; value: string }): Promise<void> {
-    if (!this.isConnected) {
-      if (this.connectionAttempts < this.maxConnectionAttempts && !this.isConnecting) {
-        try {
-          await this.connect();
-        } catch (error) {
-          this.logger.warn(
-            `Não foi possível enviar mensagem para o tópico ${topic} porque o Kafka está desconectado.`
-          );
-          return;
-        }
-      } else {
-        this.logger.warn(
-          `Mensagem para o tópico ${topic} descartada porque o Kafka está desativado.`
-        );
-        return;
-      }
-    }
-
-    if (!this.isConnected) {
-      this.logger.warn(`Mensagem para o tópico ${topic} descartada porque o Kafka continua desconectado.`);
-      return;
-    }
-
-    try {
-      const record: ProducerRecord = {
-        topic,
-        messages: [
-          {
-            key: message.key,
-            value: message.value,
-          },
-        ],
-      };
-
-      await this.producer.send(record);
-      this.logger.log(`Mensagem enviada com sucesso para o tópico ${topic}`);
-    } catch (error) {
-      this.logger.error(`Erro ao enviar mensagem para o tópico ${topic}: ${error.message}`);
-      this.logger.warn('A mensagem foi descartada, mas a aplicação continuará funcionando.');
-      
-      this.isConnected = false;
-    }
-  }
+const mockProducer = {
+  connect: jest.fn().mockResolvedValue(undefined),
+  disconnect: jest.fn().mockResolvedValue(undefined),
+  send: jest.fn().mockResolvedValue({
+    topicName: 'test-topic',
+    partition: 0,
+    errorCode: 0,
+  }),
+  sendBatch: jest.fn().mockResolvedValue({
+    topicName: 'test-topic',
+    partition: 0,
+    errorCode: 0,
+  }),
+  transaction: jest.fn(),
+  events: {
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    request: jest.fn(),
+    requestTimeout: jest.fn(),
+    requestQueue: jest.fn(),
+  },
+  logger: jest.fn(),
+  on: jest.fn(),
+  once: jest.fn(),
+  removeListener: jest.fn(),
+  removeAllListeners: jest.fn(),
 }
+
+const mockKafka = {
+  producer: jest.fn().mockReturnValue(mockProducer),
+}
+
+jest.mock('kafkajs', () => ({
+  Kafka: jest.fn().mockImplementation(() => mockKafka),
+}))
+
+describe('KafkaProducerService', () => {
+  let service: KafkaProducerService
+  let configService: ConfigService
+  let logger: Logger
+
+  beforeEach(async () => {
+    jest.clearAllMocks()
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        KafkaProducerService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key, defaultValue) => {
+              const config = {
+                KAFKA_BROKERS: 'kafka:9092',
+                KAFKA_RETRY_MAX: 5,
+                KAFKA_RETRY_FACTOR: 1.5,
+                KAFKA_CONNECTION_TIMEOUT: 30000,
+              }
+              return config[key] || defaultValue
+            }),
+          },
+        },
+        {
+          provide: Logger,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+          },
+        },
+      ],
+    }).compile()
+
+    service = module.get<KafkaProducerService>(KafkaProducerService)
+    configService = module.get<ConfigService>(ConfigService)
+    logger = module.get<Logger>(Logger)
+  })
+
+  it('should be defined', () => {
+    expect(service).toBeDefined()
+  })
+
+  describe('onModuleInit', () => {
+    it('should attempt to connect to Kafka', async () => {
+      await service.onModuleInit()
+      expect(mockProducer.connect).toHaveBeenCalled()
+    })
+
+    it('should not break initialization if connection fails', async () => {
+      mockProducer.connect.mockRejectedValueOnce(new Error('Connection failed'))
+
+      await expect(service.onModuleInit()).resolves.not.toThrow()
+    })
+  })
+
+  describe('onApplicationShutdown', () => {
+    it('should disconnect from Kafka if connected', async () => {
+      service['isConnected'] = true
+      service['producer'] = mockProducer as unknown as Producer
+
+      await service.onApplicationShutdown()
+      expect(mockProducer.disconnect).toHaveBeenCalled()
+    })
+
+    it('should not attempt to disconnect if not connected', async () => {
+      service['isConnected'] = false
+
+      await service.onApplicationShutdown()
+      expect(mockProducer.disconnect).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('publish', () => {
+    it('should publish a message to Kafka with string value', async () => {
+      service['isConnected'] = true
+      service['producer'] = mockProducer as unknown as Producer
+
+      const topic = 'test-topic'
+      const message = {
+        key: 'key1',
+        value: JSON.stringify({ data: 'test' }),
+      }
+
+      await service.publish(topic, message)
+
+      expect(mockProducer.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          topic,
+          messages: expect.arrayContaining([
+            expect.objectContaining({
+              key: message.key,
+              value: message.value,
+            }),
+          ]),
+        }),
+      )
+    })
+
+    it('should stringify non-string values automatically', async () => {
+      service['isConnected'] = true
+      service['producer'] = mockProducer as unknown as Producer
+
+      const topic = 'test-topic'
+      const messageObj = {
+        orderId: '123',
+        customerName: 'Test Customer',
+      }
+
+      await service.publish(topic, messageObj)
+
+      expect(mockProducer.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          topic,
+          messages: expect.arrayContaining([
+            expect.objectContaining({
+              value: expect.any(String),
+            }),
+          ]),
+        }),
+      )
+    })
+  })
+
+  describe('comportamento com falhas', () => {
+    it('should handle connection errors gracefully', async () => {
+      mockProducer.connect.mockRejectedValueOnce(new Error('Connection failed'))
+      service['isConnected'] = false
+
+      const topic = 'test-topic'
+      const message = {
+        key: 'key1',
+        value: JSON.stringify({ data: 'test' }),
+      }
+
+      await expect(service.publish(topic, message)).resolves.not.toThrow()
+
+      expect(mockProducer.connect).toHaveBeenCalled()
+      expect(mockProducer.send).not.toHaveBeenCalled()
+    })
+
+    it('should handle send errors gracefully', async () => {
+      service['isConnected'] = true
+      service['producer'] = mockProducer as unknown as Producer
+      mockProducer.send.mockRejectedValueOnce(new Error('Send failed'))
+
+      const topic = 'test-topic'
+      const message = {
+        key: 'key1',
+        value: JSON.stringify({ data: 'test' }),
+      }
+
+      await expect(service.publish(topic, message)).resolves.not.toThrow()
+
+      expect(service['isConnected']).toBe(false)
+    })
+
+    it('should not try to publish when disconnected', async () => {
+      service['isConnected'] = false
+      service['connectionAttempts'] = 10
+      service['maxRetries'] = 5
+
+      const topic = 'test-topic'
+      const message = {
+        key: 'key1',
+        value: JSON.stringify({ data: 'test' }),
+      }
+
+      await service.publish(topic, message)
+
+      expect(mockProducer.connect).not.toHaveBeenCalled()
+      expect(mockProducer.send).not.toHaveBeenCalled()
+    })
+  })
+})
+
+export { KafkaProducerService }

@@ -14,19 +14,38 @@ export class OrderService {
   remove(id: string): void | PromiseLike<void> {
     throw new Error('Method not implemented.')
   }
-  update(id: string, updateOrderDto: UpdateOrderDto): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+  update(
+    id: string,
+    updateOrderDto: UpdateOrderDto,
+  ):
+    | import('../entities/order.entity').Order
+    | PromiseLike<import('../entities/order.entity').Order> {
     throw new Error('Method not implemented.')
   }
-  findById(id: string): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+  findById(
+    id: string,
+  ):
+    | import('../entities/order.entity').Order
+    | PromiseLike<import('../entities/order.entity').Order> {
     throw new Error('Method not implemented.')
   }
-  search(filterDto: FilterOrderDto): import("../entities/order.entity").Order[] | PromiseLike<import("../entities/order.entity").Order[]> {
+  search(
+    filterDto: FilterOrderDto,
+  ):
+    | import('../entities/order.entity').Order[]
+    | PromiseLike<import('../entities/order.entity').Order[]> {
     throw new Error('Method not implemented.')
   }
-  findAll(): import("../entities/order.entity").Order[] | PromiseLike<import("../entities/order.entity").Order[]> {
+  findAll():
+    | import('../entities/order.entity').Order[]
+    | PromiseLike<import('../entities/order.entity').Order[]> {
     throw new Error('Method not implemented.')
   }
-  create(createOrderDto: CreateOrderDto): import("../entities/order.entity").Order | PromiseLike<import("../entities/order.entity").Order> {
+  create(
+    createOrderDto: CreateOrderDto,
+  ):
+    | import('../entities/order.entity').Order
+    | PromiseLike<import('../entities/order.entity').Order> {
     throw new Error('Method not implemented.')
   }
   getOrderById(orderId: string) {
@@ -45,7 +64,6 @@ export class OrderService {
     private readonly orderRepository: any,
     private readonly kafkaClient: any,
   ) {}
-
 
   async updateOrderStatus(orderId: string, status: OrderStatus) {
     const order = await this.orderRepository.findOne(orderId)

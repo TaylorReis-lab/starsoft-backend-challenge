@@ -7,4 +7,4 @@ export enum OrderStatus {
   REFUNDED = 'refunded',
   FAILED = 'failed',
   CREATED = 'CREATED',
-} 
+}

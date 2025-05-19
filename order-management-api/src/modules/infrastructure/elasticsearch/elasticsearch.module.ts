@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
-import { Client } from '@elastic/elasticsearch';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ElasticsearchModule as NestElasticsearchModule } from '@nestjs/elasticsearch'
+import { ElasticsearchService } from './elasticsearch.service'
 
 @Module({
-  providers: [
-    {
-      provide: Client,
-      useFactory: () => {
-        return new Client({ node: 'http://localhost:9200' }); // Ajuste a URL se necessário
-      },
-    },
+  imports: [
+    NestElasticsearchModule.register({
+      node: 'http://elasticsearch:9200',
+    }),
   ],
-  exports: [Client],
+  providers: [ElasticsearchService],
+  exports: [ElasticsearchService],
 })
 export class ElasticsearchModule {}

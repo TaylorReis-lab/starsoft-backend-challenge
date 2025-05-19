@@ -1,33 +1,33 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { OrderStatus } from '../entities/order.entity';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsEnum, IsOptional, IsString } from 'class-validator'
+import { OrderStatus } from '../entities/order.entity'
 
 export class UpdateOrderDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status do pedido',
     enum: OrderStatus,
-    example: OrderStatus.PROCESSING 
+    example: OrderStatus.PROCESSING,
   })
   @IsEnum(OrderStatus)
   @IsOptional()
-  status?: OrderStatus;
+  status?: OrderStatus
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Endereço de entrega',
     example: 'Rua Exemplo, 123 - São Paulo/SP',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
-  shippingAddress?: string;
+  shippingAddress?: string
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Observações do pedido',
     example: 'Entregar na portaria',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
-  notes?: string;
-  quantity: undefined;
+  notes?: string
+  quantity: undefined
 }

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Order } from '../../modules/orders/entities/order.entity'
-import { OrderService } from '../../modules/orders/services/orders.service'
-import { OrderStatus } from '../../modules/orders/enums/order-status.enum'
-import { OrderItem } from '../../modules/orders/entities/order-item.entity'
+import { Order } from './entities/order.entity'
+import { OrderService } from './services/orders.service'
+import { OrderStatus } from './enums/order-status.enum'
+import { OrderItem } from './entities/order-item.entity'
 
 describe('OrdersService', () => {
   let service: OrderService
@@ -50,7 +50,7 @@ describe('OrdersService', () => {
         } as unknown as OrderItem,
       ],
       addItem: jest.fn(),
-    }
+    } as any
 
     jest.spyOn(orderRepository, 'findOne').mockResolvedValue(mockOrder)
 

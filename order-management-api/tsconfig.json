@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    "types": ["node", "jest"],
     "paths": {
       "@common/*": ["src/common/*"],
       "@config/*": ["src/config/*"],
@@ -24,9 +25,9 @@
       "@elasticsearch/*": [".docker/elasticsearch/*"],
       "@kafka/*": ["src/modules/infrastructure/kafka/*"],
       "@modules/*": ["src/modules/*"],
-      "@test/*": ["src/test/*"]
-    }
+    },
+    "esModuleInterop": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }

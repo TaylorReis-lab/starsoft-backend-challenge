@@ -1,10 +1,26 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { OrderService } from '../services/orders.service';
-import { Order } from '../entities/order.entity';
-import { CreateOrderDto } from '../dtos/create-order.dto';
-import { UpdateOrderDto } from '../dtos/update-order.dto';
-import { FilterOrderDto } from '../dtos/filter-order.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+  HttpStatus,
+} from '@nestjs/common'
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger'
+import { OrderService } from '../services/orders.service'
+import { Order } from '../entities/order.entity'
+import { CreateOrderDto } from '../dtos/create-order.dto'
+import { UpdateOrderDto } from '../dtos/update-order.dto'
+import { FilterOrderDto } from '../dtos/filter-order.dto'
 
 @ApiTags('pedidos')
 @Controller('orders')
@@ -19,7 +35,7 @@ export class OrdersController {
     type: Order,
   })
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    return this.ordersService.create(createOrderDto);
+    return this.ordersService.create(createOrderDto)
   }
 
   @Get()
@@ -30,7 +46,7 @@ export class OrdersController {
     type: [Order],
   })
   async findAll(): Promise<Order[]> {
-    return this.ordersService.findAll();
+    return this.ordersService.findAll()
   }
 
   @Get('search')
@@ -41,7 +57,7 @@ export class OrdersController {
     type: [Order],
   })
   async search(@Query() filterDto: FilterOrderDto): Promise<Order[]> {
-    return this.ordersService.search(filterDto);
+    return this.ordersService.search(filterDto)
   }
 
   @Get(':id')
@@ -57,7 +73,7 @@ export class OrdersController {
     description: 'Pedido não encontrado',
   })
   async findById(@Param('id') id: string): Promise<Order> {
-    return this.ordersService.findById(id);
+    return this.ordersService.findById(id)
   }
 
   @Patch(':id')
@@ -76,7 +92,7 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
   ): Promise<Order> {
-    return this.ordersService.update(id, updateOrderDto);
+    return this.ordersService.update(id, updateOrderDto)
   }
 
   @Delete(':id')
@@ -91,6 +107,6 @@ export class OrdersController {
     description: 'Pedido não encontrado',
   })
   async remove(@Param('id') id: string): Promise<void> {
-    return this.ordersService.remove(id);
+    return this.ordersService.remove(id)
   }
 }

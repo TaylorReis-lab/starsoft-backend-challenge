@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ElasticsearchService as NestElasticsearchService } from '@nestjs/elasticsearch'
-import { Order } from '../../../orders/entities/order.entity'
-import { OrderStatus } from '../../../orders/enums/order-status.enum'
+import { Order } from '../../orders/entities/order.entity'
+import { OrderStatus } from '../../orders/enums/order-status.enum'
 import { IndicesCreateRequest } from '@elastic/elasticsearch/lib/api/types'
 import { FilterOrderDto } from '@modules/orders/dtos/filter-order.dto'
 
