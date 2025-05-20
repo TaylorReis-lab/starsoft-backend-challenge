@@ -17,7 +17,8 @@ API para gerenciamento de pedidos construída com NestJS, utilizando Kafka para 
 
 ## Estrutura do Projeto
 
-# order-management-api/
+```plaintext
+order-management-api/
 ├── src/
 │   ├── app.module.ts
 │   ├── main.ts
@@ -40,6 +41,7 @@ API para gerenciamento de pedidos construída com NestJS, utilizando Kafka para 
 ├── package.json
 ├── tsconfig.json
 └── README.md
+```
 
 - **modules/orders:** contém toda lógica relacionada a pedidos (entidades, controladores, serviços, DTOs e repositórios).
 - **modules/kafka:** serviço responsável pela produção e consumo de eventos Kafka.
@@ -90,18 +92,17 @@ Elasticsearch:
 4. Verifique a saúde da API:
 
 
-
 curl http://localhost:3000/health
 
-Endpoints principais
+## Endpoints principais
 
-Método	Rota	Descrição
-
-GET	/orders	Lista pedidos com filtros opcionais
-GET	/orders/:id	Obtém pedido por ID
-POST	/orders	Cria um novo pedido
-PUT	/orders/:id	Atualiza pedido existente
-DELETE	/orders/:id	Remove um pedido
+| Método | Rota           | Descrição                  |
+|--------|----------------|----------------------------|
+| GET    | /orders        | Lista todos os pedidos     |
+| GET    | /orders/:id    | Retorna um pedido por ID   |
+| POST   | /orders        | Cria um novo pedido        |
+| PUT    | /orders/:id    | Atualiza um pedido existente |
+| DELETE | /orders/:id    | Remove um pedido           |
 
 
 Event Streaming com Kafka
