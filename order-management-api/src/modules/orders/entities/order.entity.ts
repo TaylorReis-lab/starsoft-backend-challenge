@@ -20,7 +20,7 @@ export const OrderStatus = {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 @Entity('orders')
-export class Order {
+export class OrderEntity {
   @ApiProperty({
     description: 'ID único do pedido',
     example: '123e4567-e89b-12d3-a456-426614174000',
@@ -110,4 +110,5 @@ export class Order {
   updatedAt: Date
   total: any
   customerId: any
+  static items: any
 }

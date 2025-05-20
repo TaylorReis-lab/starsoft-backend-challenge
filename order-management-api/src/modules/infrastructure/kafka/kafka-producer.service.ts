@@ -1,3 +1,5 @@
+import { OrderStatus } from '@modules/orders/entities/order.entity'
+import { KafkaTopics } from '@modules/shared/enums/kafka-topics.enum'
 import {
   Injectable,
   Logger,
@@ -11,6 +13,9 @@ import { Kafka, Producer, ProducerRecord } from 'kafkajs'
 export class KafkaProducerService
   implements OnModuleInit, OnApplicationShutdown
 {
+  emit(ORDER_STATUS_CHANGED: KafkaTopics, arg1: { orderId: string; newStatus: OrderStatus; updatedAt: Date }) {
+    throw new Error('Method not implemented.')
+  }
   private readonly logger = new Logger(KafkaProducerService.name)
   private producer: Producer
   private readonly kafka: Kafka

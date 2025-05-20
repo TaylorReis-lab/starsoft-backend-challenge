@@ -1,19 +1,26 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, Between, Like } from 'typeorm'
-import { Order } from './entities/order.entity'
+import { OrderEntity } from './entities/order.entity'
 import { CreateOrderDto } from './dtos/create-order.dto'
 import { UpdateOrderDto } from './dtos/update-order.dto'
 import { FilterOrderDto } from './dtos/filter-order.dto'
 
 @Injectable()
 export class OrdersRepository {
+  save(order: OrderEntity): Promise<OrderEntity> {
+    return this.orderRepository.save(order)
+  }
   constructor(
-    @InjectRepository(Order)
-    private readonly orderRepository: Repository<Order>,
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async findOne(orderId: string): Promise<OrderEntity | null> {
+    return this.findById(orderId)
+  }
+
+  async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
     const totalAmount = createOrderDto.items.reduce(
       (sum, item) => sum + item.subtotal,
       0,
@@ -38,20 +45,20 @@ export class OrdersRepository {
     return this.orderRepository.save(order)
   }
 
-  async findAll(): Promise<Order[]> {
+  async findAll(): Promise<OrderEntity[]> {
     return this.orderRepository.find({
       order: { createdAt: 'DESC' },
     })
   }
 
-  async findById(id: string): Promise<Order | null> {
+  async findById(id: string): Promise<OrderEntity | null> {
     return this.orderRepository.findOne({ where: { id } })
   }
 
   async update(
     id: string,
     updateOrderDto: UpdateOrderDto,
-  ): Promise<Order | null> {
+  ): Promise<OrderEntity | null> {
     const order = await this.findById(id)
 
     if (!order) return null
@@ -69,29 +76,32 @@ export class OrdersRepository {
     return (result.affected ?? 0) > 0
   }
 
-  async filter(filterDto: FilterOrderDto): Promise<Order[]> {
+  async filter(filterDto: FilterOrderDto): Promise<OrderEntity[]> {
     const queryBuilder = this.orderRepository
-      .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
+      .createQueryBuilder('OrderEntity')
+      .leftJoinAndSelect('OrderEntity.items', 'items')
 
     if (filterDto.id)
-      queryBuilder.andWhere('order.id = :id', { id: filterDto.id })
+      queryBuilder.andWhere('OrderEntity.id = :id', { id: filterDto.id })
     if (filterDto.status)
-      queryBuilder.andWhere('order.status = :status', {
+      queryBuilder.andWhere('OrderEntity.status = :status', {
         status: filterDto.status,
       })
 
     if (filterDto.startDate && filterDto.endDate) {
-      queryBuilder.andWhere('order.createdAt BETWEEN :startDate AND :endDate', {
-        startDate: filterDto.startDate,
-        endDate: filterDto.endDate,
-      })
+      queryBuilder.andWhere(
+        'OrderEntity.createdAt BETWEEN :startDate AND :endDate',
+        {
+          startDate: filterDto.startDate,
+          endDate: filterDto.endDate,
+        },
+      )
     } else if (filterDto.startDate) {
-      queryBuilder.andWhere('order.createdAt >= :startDate', {
+      queryBuilder.andWhere('OrderEntity.createdAt >= :startDate', {
         startDate: filterDto.startDate,
       })
     } else if (filterDto.endDate) {
-      queryBuilder.andWhere('order.createdAt <= :endDate', {
+      queryBuilder.andWhere('OrderEntity.createdAt <= :endDate', {
         endDate: filterDto.endDate,
       })
     }
@@ -105,12 +115,12 @@ export class OrdersRepository {
 
     if (filterDto.query) {
       queryBuilder.andWhere(
-        '(order.customerName LIKE :query OR order.customerEmail LIKE :query OR order.shippingAddress LIKE :query OR order.notes LIKE :query)',
+        '(OrderEntity.customerName LIKE :query OR OrderEntity.customerEmail LIKE :query OR OrderEntity.shippingAddress LIKE :query OR OrderEntity.notes LIKE :query)',
         { query: `%${filterDto.query}%` },
       )
     }
 
-    queryBuilder.orderBy('order.createdAt', 'DESC')
+    queryBuilder.orderBy('OrderEntity.createdAt', 'DESC')
 
     return queryBuilder.getMany()
   }

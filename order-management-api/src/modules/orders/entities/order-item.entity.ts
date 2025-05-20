@@ -5,18 +5,18 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
-import { Order } from './order.entity'
+import { OrderEntity } from './order.entity'
 
 @Entity()
 export class OrderItem {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @ManyToOne(() => Order, (order) => order.items, {
+  @ManyToOne(() => OrderEntity, (order) => OrderEntity.items, {
     onDelete: 'CASCADE', // Remove o item se o pedido for deletado
   })
   @JoinColumn({ name: 'order_id' })
-  order: Order
+  order: OrderEntity
 
   @Column({
     type: 'decimal',
@@ -55,3 +55,5 @@ export class OrderItem {
     this.totalPrice = this.unitPrice * this.quantity
   }
 }
+export { OrderEntity }
+

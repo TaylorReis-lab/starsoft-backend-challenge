@@ -1,13 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ElasticsearchService as NestElasticsearchService } from '@nestjs/elasticsearch'
-import { Order } from '../../orders/entities/order.entity'
-import { OrderStatus } from '../../orders/enums/order-status.enum'
+import { OrderEntity, OrderStatus } from '../../orders/entities/order.entity'
 import { IndicesCreateRequest } from '@elastic/elasticsearch/lib/api/types'
 import { FilterOrderDto } from '@modules/orders/dtos/filter-order.dto'
 
 @Injectable()
 export class ElasticsearchService implements OnModuleInit {
-  updateOrderIndex(_updatedOrder: Order) {
+  updateOrderIndex(_updatedOrder: OrderEntity) {
     throw new Error('Method not implemented.')
   }
   search(_filterDto: FilterOrderDto) {
@@ -89,7 +88,7 @@ export class ElasticsearchService implements OnModuleInit {
     }
   }
 
-  async indexOrder(order: Order): Promise<void> {
+  async indexOrder(order: OrderEntity): Promise<void> {
     try {
       await this.elasticsearchService.index({
         index: this.indexName,
@@ -102,7 +101,7 @@ export class ElasticsearchService implements OnModuleInit {
     }
   }
 
-  private transformOrderToDocument(order: Order) {
+  private transformOrderToDocument(order: OrderEntity) {
     return {
       id: order.id,
       status: order.status,
@@ -120,14 +119,14 @@ export class ElasticsearchService implements OnModuleInit {
     toDate?: Date
     minTotal?: number
     maxTotal?: number
-  }): Promise<Order[]> {
+  }): Promise<OrderEntity[]> {
     try {
-      const { hits } = await this.elasticsearchService.search<Order>({
+      const { hits } = await this.elasticsearchService.search<OrderEntity>({
         index: this.indexName,
         query: this.buildSearchQuery(params),
       })
 
-      return hits.hits.map((hit) => hit._source as Order)
+      return hits.hits.map((hit) => hit._source as OrderEntity)
     } catch (error) {
       this.logger.error(`Search failed: ${error.message}`)
       throw error

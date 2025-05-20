@@ -3,7 +3,7 @@ import { ElasticsearchService } from './elasticsearch.service'
 import { ElasticsearchService as NestElasticsearchService } from '@nestjs/elasticsearch'
 import { ConfigService } from '@nestjs/config'
 import { Logger } from '@nestjs/common'
-import { Order, OrderStatus } from '../../orders/entities/order.entity'
+import { OrderEntity, OrderStatus } from '../../orders/entities/order.entity'
 import { FilterOrderDto } from '../../orders/dtos/filter-order.dto'
 import { beforeEach, describe, it } from 'node:test'
 
@@ -12,7 +12,7 @@ describe('ElasticsearchService', () => {
   let nestElasticsearchService: NestElasticsearchService
   let logger: Logger
 
-  const mockOrder: Partial<Order> = {
+  const mockOrder: Partial<OrderEntity> = {
     id: '1',
     customerName: 'John Doe',
     customerEmail: 'john@example.com',
@@ -132,7 +132,7 @@ describe('ElasticsearchService', () => {
 
       const indexOrderSpy = jest.spyOn(service, 'indexOrder')
 
-      await service.indexOrder(mockOrder as Order)
+      await service.indexOrder(mockOrder as OrderEntity)
 
       expect(indexOrderSpy).toHaveBeenCalledWith(mockOrder)
     })
@@ -149,7 +149,7 @@ describe('ElasticsearchService', () => {
       )
 
       await expect(
-        service.indexOrder(mockOrder as Order),
+        service.indexOrder(mockOrder as OrderEntity),
       ).resolves.not.toThrow()
     })
   })
@@ -164,7 +164,7 @@ describe('ElasticsearchService', () => {
 
       const updateOrderSpy = jest.spyOn(service, 'updateOrderIndex')
 
-      await service.updateOrderIndex(mockOrder as Order)
+      await service.updateOrderIndex(mockOrder as OrderEntity)
 
       expect(updateOrderSpy).toHaveBeenCalledWith(mockOrder)
     })

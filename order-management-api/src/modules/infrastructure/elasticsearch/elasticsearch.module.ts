@@ -1,15 +1,21 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ElasticsearchModule as NestElasticsearchModule } from '@nestjs/elasticsearch'
-import { ElasticsearchService } from './elasticsearch.service'
+import { ElasticsearchModule } from '@nestjs/elasticsearch'
 
 @Module({
   imports: [
-    NestElasticsearchModule.register({
-      node: 'http://elasticsearch:9200',
+    ConfigModule,
+    ElasticsearchModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        node: configService.get('ELASTICSEARCH_NODE'),
+        maxRetries: 3,
+        requestTimeout: 10000,
+      }),
     }),
   ],
-  providers: [ElasticsearchService],
-  exports: [ElasticsearchService],
 })
-export class ElasticsearchModule {}
+export class MyElasticModule {}
+export { ElasticsearchModule }
+

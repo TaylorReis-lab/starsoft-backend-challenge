@@ -1,26 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Patch,
-  Delete,
-  Query,
-  HttpStatus,
-} from '@nestjs/common'
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger'
-import { OrderService } from '../services/orders.service'
-import { Order } from '../entities/order.entity'
-import { CreateOrderDto } from '../dtos/create-order.dto'
-import { UpdateOrderDto } from '../dtos/update-order.dto'
-import { FilterOrderDto } from '../dtos/filter-order.dto'
+import { Controller, Get, Post, Body, Param, Patch, Delete, Query, HttpStatus } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { OrderService } from '../services/orders.service';
+import { OrderEntity } from '../entities/order.entity';
+import { CreateOrderDto } from '../dtos/create-order.dto';
+import { UpdateOrderDto } from '../dtos/update-order.dto';
+import { FilterOrderDto } from '../dtos/filter-order.dto';
 
 @ApiTags('pedidos')
 @Controller('orders')
@@ -32,10 +16,10 @@ export class OrdersController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Pedido criado com sucesso',
-    type: Order,
+    type: OrderEntity,
   })
-  async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    return this.ordersService.create(createOrderDto)
+  async create(@Body() createOrderDto: CreateOrderDto): Promise<OrderEntity> {
+    return this.ordersService.create(createOrderDto);
   }
 
   @Get()
@@ -43,10 +27,10 @@ export class OrdersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Lista de pedidos retornada com sucesso',
-    type: [Order],
+    type: [OrderEntity],
   })
-  async findAll(): Promise<Order[]> {
-    return this.ordersService.findAll()
+  async findAll(): Promise<OrderEntity[]> {
+    return this.ordersService.findAll();
   }
 
   @Get('search')
@@ -54,10 +38,10 @@ export class OrdersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Pedidos encontrados com base nos filtros',
-    type: [Order],
+    type: [OrderEntity],
   })
-  async search(@Query() filterDto: FilterOrderDto): Promise<Order[]> {
-    return this.ordersService.search(filterDto)
+  async search(@Query() filterDto: FilterOrderDto): Promise<OrderEntity[]> {
+    return this.ordersService.search(filterDto);
   }
 
   @Get(':id')
@@ -66,14 +50,14 @@ export class OrdersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Pedido encontrado',
-    type: Order,
+    type: OrderEntity,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Pedido não encontrado',
   })
-  async findById(@Param('id') id: string): Promise<Order> {
-    return this.ordersService.findById(id)
+  async findById(@Param('id') id: string): Promise<OrderEntity> {
+    return this.ordersService.findById(id);
   }
 
   @Patch(':id')
@@ -82,7 +66,7 @@ export class OrdersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Pedido atualizado com sucesso',
-    type: Order,
+    type: OrderEntity,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -91,8 +75,8 @@ export class OrdersController {
   async update(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
-  ): Promise<Order> {
-    return this.ordersService.update(id, updateOrderDto)
+  ): Promise<OrderEntity> {
+    return this.ordersService.update(id, updateOrderDto);
   }
 
   @Delete(':id')
@@ -107,6 +91,6 @@ export class OrdersController {
     description: 'Pedido não encontrado',
   })
   async remove(@Param('id') id: string): Promise<void> {
-    return this.ordersService.remove(id)
+    return this.ordersService.remove(id);
   }
 }

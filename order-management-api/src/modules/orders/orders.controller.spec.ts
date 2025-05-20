@@ -9,7 +9,7 @@ import { ElasticsearchService } from '../infrastructure/elasticsearch/elasticsea
 import { CreateOrderDto } from './dtos/create-order.dto'
 import { UpdateOrderDto } from './dtos/update-order.dto'
 import { FilterOrderDto } from './dtos/filter-order.dto'
-import { Order, OrderStatus } from './entities/order.entity'
+import { OrderEntity, OrderStatus } from './entities/order.entity'
 import { OrderItem } from './entities/order-item.entity'
 import { afterEach, beforeEach, describe, it } from 'node:test'
 
@@ -36,7 +36,7 @@ describe('OrdersController (Integration)', () => {
     orderId: '1',
   }
 
-  const mockOrder: Partial<Order> = {
+  const mockOrder: Partial<OrderEntity> = {
     id: '1',
     customerName: 'John Doe',
     customerEmail: 'john@example.com',
@@ -69,25 +69,21 @@ describe('OrdersController (Integration)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
       providers: [
-        {
-          provide: OrderService,
-          useValue: mockOrdersService,
-        },
-        {
-          provide: OrdersRepository,
-          useValue: {},
-        },
-        {
-          provide: KafkaProducerService,
-          useValue: { emit: jest.fn() },
-        },
-        {
-          provide: ElasticsearchService,
-          useValue: { indexOrder: jest.fn(), removeOrderFromIndex: jest.fn() },
-        },
+        OrderService,
+        OrdersRepository,
+        KafkaProducerService,
+        ElasticsearchService,
       ],
-    }).compile()
-
+    })
+      .overrideProvider(OrderService)
+      .useValue(mockOrdersService)
+      .overrideProvider(OrdersRepository)
+      .useValue({})
+      .overrideProvider(KafkaProducerService)
+      .useValue({ emit: jest.fn() })
+      .overrideProvider(ElasticsearchService)
+      .useValue({ indexOrder: jest.fn(), removeOrderFromIndex: jest.fn() })
+      .compile()
     app = moduleFixture.createNestApplication()
 
     app.useGlobalPipes(
