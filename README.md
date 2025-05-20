@@ -17,7 +17,7 @@ API para gerenciamento de pedidos construída com NestJS, utilizando Kafka para 
 
 ## Estrutura do Projeto
 
-order-management-api/
+# order-management-api/
 ├── src/
 │   ├── app.module.ts
 │   ├── main.ts
@@ -64,6 +64,7 @@ order-management-api/
 ```bash
 git clone <repo-url>
 cd order-management-api
+```
 
 2. Configure as variáveis de ambiente no arquivo .env (exemplo já fornecido no projeto).
 
@@ -71,8 +72,9 @@ cd order-management-api
 3. Suba os containers Docker:
 
 
-
+```bash
 docker-compose up --build
+```
 
 Isso vai iniciar os serviços:
 
@@ -134,13 +136,3 @@ Utilize npm run start:dev para rodar em modo desenvolvimento (watch mode).
 Considerações Finais
 
 Este projeto é uma base robusta para aplicações que demandam alta escalabilidade e integração via eventos. O uso combinado de Kafka e Elasticsearch permite tratar grandes volumes de dados e oferecer respostas rápidas para buscas complexas.
-
-
----
-
-Se precisar de ajuda com algo mais, é só chamar!
-
----
-
-Quer que eu gere o arquivo pra você salvar localmente? Posso criar e disponibilizar para download.
-
