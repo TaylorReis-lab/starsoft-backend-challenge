@@ -137,3 +137,11 @@ Utilize npm run start:dev para rodar em modo desenvolvimento (watch mode).
 Considerações Finais
 
 Este projeto é uma base robusta para aplicações que demandam alta escalabilidade e integração via eventos. O uso combinado de Kafka e Elasticsearch permite tratar grandes volumes de dados e oferecer respostas rápidas para buscas complexas.
+
+  ---
+
+## Créditos
+
+Projeto projetado e desenvolvido por [Taylor Reis](https://github.com/TaylorReis) para fins de avaliação técnica no processo seletivo da **Starsoft**.
+
+Este repositório tem cunho exclusivo de **teste técnico** e demonstra a aplicação de boas práticas com NestJS, Kafka, PostgreSQL e Elasticsearch.
